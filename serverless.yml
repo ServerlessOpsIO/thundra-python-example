@@ -1,0 +1,81 @@
+# Wild Rydes pricing service
+service: thundra-python-example
+
+plugins:
+  - serverless-python-requirements
+
+custom:
+  stage: "${opt:stage, env:SLS_STAGE, 'dev'}"
+  profile: "${opt:aws-profile, env:AWS_PROFILE, env:AWS_DEFAULT_PROFILE, 'default'}"
+  region: "${opt:region, 'us-east-2'}"
+  log_level: "${env:LOG_LEVEL, 'INFO'}"
+
+  thundraApiKey: "${env:THUNDRA_API_KEY, ''}"
+  thundraAdapterFunctionMemorySize: 128
+
+
+provider:
+  name: aws
+  runtime: python3.6
+  stage: ${self:custom.stage}
+  region: ${self:custom.region}
+  profile: ${self:custom.profile}
+  environment:
+    LOG_LEVEL: ${self:custom.log_level}
+    THUNDRA_API_KEY: ${self:custom.thundraApiKey}
+  stackTags:
+    serverless:service: ${self:service}
+
+functions:
+
+  GetPricing:
+    handler: handlers/get_pricing.handler
+    description: "Test pricing"
+    memorySize: 128
+    timeout: 10
+    events:
+      - http:
+          path: "/pricing"
+          method: get
+
+  Hello:
+    handler: handlers/hello_thundra.handler
+    description: "Test Thundra"
+    memorySize: 128
+    timeout: 10
+    events:
+      - http:
+          path: "/hello"
+          method: get
+
+resources:
+
+  Outputs:
+    ServiceUrlHello:
+      Description: "URL for the deployed API on API Gateway"
+      Value:
+        Fn::Join:
+          - ""
+          - - "https://"
+            - Ref: ApiGatewayRestApi
+            - ".execute-api."
+            - Ref: AWS::Region
+            - ".amazonaws.com/${self:custom.stage}"
+            - "/hello"
+      Export:
+        Name: "${self:service}-${self:provider.stage}-ServiceUrlHello"
+
+    ServiceUrlPricing:
+      Description: "URL for the deployed API on API Gateway"
+      Value:
+        Fn::Join:
+          - ""
+          - - "https://"
+            - Ref: ApiGatewayRestApi
+            - ".execute-api."
+            - Ref: AWS::Region
+            - ".amazonaws.com/${self:custom.stage}"
+            - "/pricing"
+      Export:
+        Name: "${self:service}-${self:provider.stage}-ServiceUrlPricing"
+
