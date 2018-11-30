@@ -1,3 +1,5 @@
+'''test hello'''
+
 import json
 import logging
 import os
@@ -16,8 +18,10 @@ thundra_handler = ThundraLogHandler()
 _logger = logging.getLogger(__name__)
 _logger.addHandler(thundra_handler)
 
+
 @thundra
 def handler(event, context):
+    '''Function entry'''
     _logger.info('This is an info log')
     _logger.debug('This is a debug log')
     _logger.warning('This is a warning log')
@@ -29,7 +33,7 @@ def handler(event, context):
     }
 
     resp = {
-        'statusCode': 201,
+        'statusCode': 200,
         'body': json.dumps(body)
     }
     return resp

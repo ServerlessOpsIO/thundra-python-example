@@ -1,4 +1,4 @@
-# Wild Rydes pricing service
+# Example for using Thundra
 service: thundra-python-example
 
 plugins:
@@ -11,7 +11,6 @@ custom:
   log_level: "${env:LOG_LEVEL, 'INFO'}"
 
   thundraApiKey: "${env:THUNDRA_API_KEY, ''}"
-  thundraAdapterFunctionMemorySize: 128
 
 
 provider:
@@ -27,16 +26,6 @@ provider:
     serverless:service: ${self:service}
 
 functions:
-
-  GetPricing:
-    handler: handlers/get_pricing.handler
-    description: "Test pricing"
-    memorySize: 128
-    timeout: 10
-    events:
-      - http:
-          path: "/pricing"
-          method: get
 
   Hello:
     handler: handlers/hello_thundra.handler
@@ -64,18 +53,4 @@ resources:
             - "/hello"
       Export:
         Name: "${self:service}-${self:provider.stage}-ServiceUrlHello"
-
-    ServiceUrlPricing:
-      Description: "URL for the deployed API on API Gateway"
-      Value:
-        Fn::Join:
-          - ""
-          - - "https://"
-            - Ref: ApiGatewayRestApi
-            - ".execute-api."
-            - Ref: AWS::Region
-            - ".amazonaws.com/${self:custom.stage}"
-            - "/pricing"
-      Export:
-        Name: "${self:service}-${self:provider.stage}-ServiceUrlPricing"
 
